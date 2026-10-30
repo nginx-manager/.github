@@ -38,7 +38,7 @@ A web-based nginx manager that runs nginx and its admin UI as two containers
 | History | Keep backup files yourself | Every apply is saved as a **version** you can compare and roll back to; files changed directly on the server are detected |
 | HTTPS | Install certbot and schedule renewals | Turn on HTTPS for a site and **Let's Encrypt issuance, setup and renewal** happen automatically |
 | Logs | SSH in and `tail` | **Search and live-tail** each site's access/error logs in the browser |
-| Access | Shared server accounts | Admin and member roles, members manage **only their own sites**, and **every change is in the audit log** |
+| Access | Shared server accounts | Admin and member roles, members manage **only their own sites**, **every change is in the audit log**, and sign-in can use **two-factor authentication (TOTP)** |
 
 ## Install on a server
 
@@ -72,6 +72,7 @@ The installer creates `/opt/nginx-manager/.env`. After editing it, run `./nm res
 | `NGINX_HTTP_PORT`, `NGINX_HTTPS_PORT` | `80`, `443` | When a proxy in front already uses 80/443 |
 | `NGINX_BIND_ADDRESS` | `0.0.0.0` | To serve nginx on one IP only |
 | `NGINX_MANAGER_BACKUP_KEEP` | `14` | Number of `nm backup` files to keep |
+| `NGINX_MANAGER_BACKUP_AT` | `03:30` | Time of the daily automatic backup. `off` turns it off. Run `sudo ./nm backup-schedule` after changing it |
 | `TZ` | `Asia/Seoul` | Time zone |
 | `NGINX_MANAGER_IMPORT_ROOTS` | Empty | To import config files from outside `/etc/nginx` |
 | `SPRING_MAIL_*` | Empty | SMTP server for email alerts |
@@ -84,7 +85,9 @@ cd /opt/nginx-manager
 ./nm restart           # restart after editing .env
 ./nm upgrade           # upgrade the admin UI only (nginx keeps serving traffic)
 ./nm upgrade --nginx   # upgrade nginx too (config is validated with the new nginx first; restarts in seconds)
-./nm backup            # back up config and database
+./nm backup            # back up config and database (also runs daily at 03:30)
+./nm backup-schedule   # reinstall the automatic backup schedule from .env
+./nm reset-2fa <user>  # turn off two-factor sign-in for an admin who lost their phone
 ./nm restore backups/<file>
 ./nm migrate           # move over from v1.0/v1.1 (install with --no-start first)
 ./nm import-root check # check the import directory is readable (grant gives read access if not)
@@ -96,13 +99,13 @@ Details are in [chapter 1 of the user guide, Installation](https://github.com/ng
 
 ### Sites from a form
 
-Set multiple backends (load balancing), WebSocket, timeouts, redirects and even HTTP/3 in a form, and see the generated nginx config right beside it. Anything the form doesn't cover can be edited in the raw editor with nginx syntax highlighting. Delete sites you no longer need; deletion is also a draft you apply (v1.3.0).
+Set multiple backends (load balancing), WebSocket, timeouts, redirects and even HTTP/3 in a form, and see the generated nginx config right beside it. PHP (PHP-FPM) sites and gRPC proxies (`grpc://`) come from the form too, and an external auth server (auth_request) such as oauth2-proxy or Authelia can guard a site (v1.4.0). Anything the form doesn't cover can be edited in the Raw editor with nginx syntax highlighting. Delete sites you no longer need; deletion is also a pending change you apply.
 
 <p align="center"><img src="images/site-form.png" alt="Site form with config preview" width="860" /></p>
 
 ### Import existing config files
 
-Register a path pattern such as `/home/*/nginx/*.conf` and every matching file is found and registered as a site in one go. Files that fit the form become form sites; the rest are kept as raw sites. You're told when an original file changes.
+Register a path pattern such as `/home/*/nginx/*.conf` and every matching file is found and registered as a site in one go. Files that fit the form become form sites; the rest become Raw sites. You're told when an original file changes.
 
 <p align="center"><img src="images/import-scan.png" alt="Importing config files" width="860" /></p>
 
@@ -114,7 +117,7 @@ Forward non-HTTP services such as databases or MQTT by port.
 
 ### Review, then apply
 
-Saved drafts are reviewed as per-file diffs before they go live. If validation, reload or the health check fails, the previous config comes back.
+Saved changes wait as pending changes and are reviewed as per-file diffs before they go live. If `nginx -t`, reload or the health check fails, the previous config is rolled back automatically.
 
 <p align="center"><img src="images/apply-diff.png" alt="Changes before applying" width="860" /></p>
 
@@ -126,15 +129,19 @@ Every apply is saved as a version. Compare any two versions or roll back to an e
 
 ### HTTPS certificates
 
-Let's Encrypt certificates are issued automatically and renewed before they expire. If a renewal fails, you're alerted by email or webhook. Wildcard and internal certificates can be uploaded. Imported raw-config sites can get a certificate too, with a 443 server block and an 80→443 redirect added as a draft (v1.2.3).
+Let's Encrypt certificates are issued automatically and renewed before they expire. If a renewal fails, you're alerted by email or webhook. Wildcard and internal certificates can be uploaded. Imported Raw sites can get a certificate too, with a 443 server block and an 80→443 redirect added as pending changes.
 
 <p align="center"><img src="images/certs.png" alt="Certificate list" width="860" /></p>
 
 ### Logs
 
-Search or live-tail each site's access/error logs. Imported raw-config sites and rotated older log files can be read too (v1.3.0).
+Search or live-tail each site's access/error logs. Imported Raw sites and rotated older log files can be read too.
 
 <p align="center"><img src="images/logs.png" alt="Viewing site logs" width="860" /></p>
+
+### Sign-in protection and automatic backups
+
+Turn on two-factor authentication with an authenticator app (TOTP) in your account, and a 6-digit code is required after the password. If a phone is lost, use a recovery code, an admin reset, or `nm reset-2fa` on the server. The server also backs itself up every day, and the dashboard shows the last backup and any failure (v1.4.0).
 
 ### Four languages and dark mode
 

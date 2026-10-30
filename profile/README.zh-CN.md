@@ -38,7 +38,7 @@
 | 历史 | 自己管理备份文件 | 每次应用都会留下**版本**，可比较、可回滚，并能发现在服务器上被直接修改的文件 |
 | HTTPS | 安装 certbot 并安排续期 | 为站点选择 HTTPS 后，**Let's Encrypt 签发、配置和续期**全部自动完成 |
 | 日志 | 登录服务器 `tail` | 在**界面上搜索、实时查看**每个站点的 access/error 日志 |
-| 权限 | 共用服务器账号 | 管理员和成员两种角色，成员**只管理自己负责的站点**，**所有变更都记入审计日志** |
+| 权限 | 共用服务器账号 | 管理员和成员两种角色，成员**只管理自己负责的站点**，**所有变更都记入审计日志**，登录可开启**两步验证（TOTP）** |
 
 ## 在服务器上安装
 
@@ -72,6 +72,7 @@ curl -fsSL https://github.com/nginx-manager/app/releases/latest/download/install
 | `NGINX_HTTP_PORT`, `NGINX_HTTPS_PORT` | `80`, `443` | 前面已有代理占用 80/443 时 |
 | `NGINX_BIND_ADDRESS` | `0.0.0.0` | 只让 nginx 监听某个 IP 时 |
 | `NGINX_MANAGER_BACKUP_KEEP` | `14` | `nm backup` 保留的份数 |
+| `NGINX_MANAGER_BACKUP_AT` | `03:30` | 每日自动备份的时间。设为 `off` 则关闭。修改后运行 `sudo ./nm backup-schedule` |
 | `TZ` | `Asia/Seoul` | 时区 |
 | `NGINX_MANAGER_IMPORT_ROOTS` | 空 | 导入 `/etc/nginx` 之外的配置文件时 |
 | `SPRING_MAIL_*` | 空 | 邮件通知使用的 SMTP 服务器 |
@@ -84,7 +85,9 @@ cd /opt/nginx-manager
 ./nm restart           # 修改 .env 后重新启动
 ./nm upgrade           # 只升级管理界面（nginx 继续处理流量）
 ./nm upgrade --nginx   # 同时升级 nginx（先用新 nginx 校验配置，几秒内重启）
-./nm backup            # 备份配置和数据库
+./nm backup            # 备份配置和数据库（每天 03:30 也会自动运行）
+./nm backup-schedule   # 按 .env 重新安装自动备份计划
+./nm reset-2fa <用户>  # 为丢失手机的管理员关闭两步验证
 ./nm restore backups/<文件>
 ./nm migrate           # 从 v1.0/v1.1 迁移（先用 --no-start 安装）
 ./nm import-root check # 检查导入目录是否可读（不可读时用 grant 授予读权限）
@@ -96,13 +99,13 @@ cd /opt/nginx-manager
 
 ### 用表单创建站点
 
-多个后端（负载均衡）、WebSocket、超时、重定向乃至 HTTP/3 都能在表单里设置，旁边即时显示生成的 nginx 配置。表单覆盖不到的配置，可在带 nginx 语法高亮的原文编辑器中修改。不再使用的站点可以删除，删除同样经过草稿 → 应用（v1.3.0）。
+多个后端（负载均衡）、WebSocket、超时、重定向乃至 HTTP/3 都能在表单里设置，旁边即时显示生成的 nginx 配置。PHP（PHP-FPM）站点和 gRPC 代理（`grpc://`）也能用表单创建，还可以在站点前放置 oauth2-proxy、Authelia 等外部认证服务器（auth_request）（v1.4.0）。表单覆盖不到的配置，可在带 nginx 语法高亮的 Raw 编辑器中修改。不再使用的站点可以删除，删除同样经过待应用 → 应用。
 
 <p align="center"><img src="images/site-form.png" alt="添加站点表单与配置预览" width="860" /></p>
 
 ### 导入已有配置文件
 
-登记 `/home/*/nginx/*.conf` 这样的路径模式后，会找出所有匹配的文件并一次性登记为站点。能转成表单的成为表单站点，其余按原文登记；原文件变化时会提醒你。
+登记 `/home/*/nginx/*.conf` 这样的路径模式后，会找出所有匹配的文件并一次性登记为站点。能转成表单的成为表单站点，其余登记为 Raw 站点；原文件变化时会提醒你。
 
 <p align="center"><img src="images/import-scan.png" alt="导入配置文件" width="860" /></p>
 
@@ -114,7 +117,7 @@ cd /opt/nginx-manager
 
 ### 先确认再应用
 
-保存的草稿先按文件查看 diff 再生效。校验、reload、状态检查中任一步失败，都会回到上一份配置。
+保存的变更进入待应用状态，先按文件查看 diff 再生效。`nginx -t`、reload、健康检查中任一步失败，都会自动回滚到上一份配置。
 
 <p align="center"><img src="images/apply-diff.png" alt="应用前的变更内容" width="860" /></p>
 
@@ -126,15 +129,19 @@ cd /opt/nginx-manager
 
 ### HTTPS 证书
 
-自动申请 Let's Encrypt 证书并在到期前续期。续期失败时通过邮件或 Webhook 通知。通配符证书和内部证书可以上传。通过导入配置文件加入的原文编辑站点也能申请证书，并以草稿形式加入 443 server 块和 80→443 跳转（v1.2.3）。
+自动申请 Let's Encrypt 证书并在到期前续期。续期失败时通过邮件或 Webhook 通知。通配符证书和内部证书可以上传。通过导入配置文件加入的 Raw 站点也能签发证书，并以待应用形式加入 443 server 块和 80→443 重定向。
 
 <p align="center"><img src="images/certs.png" alt="证书列表" width="860" /></p>
 
 ### 日志
 
-搜索或实时查看每个站点的 access/error 日志。也能读取导入的原文编辑站点的日志和轮转后的历史日志（v1.3.0）。
+搜索或实时查看每个站点的 access/error 日志。也能读取导入的 Raw 站点的日志和轮转后的历史日志。
 
 <p align="center"><img src="images/logs.png" alt="查看站点日志" width="860" /></p>
+
+### 登录保护与自动备份
+
+在账户页面开启认证器应用（TOTP）两步验证后，输入密码后还需输入 6 位验证码。手机丢失时，可用恢复码、由管理员解除，或在服务器上运行 `nm reset-2fa`。服务器每天自动备份，仪表盘会显示最近一次备份和失败情况（v1.4.0）。
 
 ### 四种语言和深色模式
 

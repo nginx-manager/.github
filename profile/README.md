@@ -35,10 +35,10 @@ nginx와 관리 화면을 컨테이너 두 개로 띄우는 웹 기반 nginx 관
 | --- | --- | --- |
 | 사이트 추가 | 설정 파일을 손으로 작성 | 리버스 프록시·정적 사이트·TCP/UDP 스트림을 **폼으로**, 만들어질 설정을 바로 미리보기 |
 | 반영 | `nginx -t` 후 reload, 실패하면 손으로 복구 | **diff 확인 → 검증 → reload → 상태 확인**, 어느 단계든 실패하면 **자동으로 직전 설정 복구** |
-| 이력 | 백업 파일을 직접 관리 | 적용할 때마다 **버전**이 남고 비교·되돌리기, 서버에서 직접 바뀐 파일도 감지 |
+| 이력 | 백업 파일을 직접 관리 | 적용할 때마다 **버전**이 남고 비교·롤백, 서버에서 직접 바뀐 파일도 감지 |
 | HTTPS | certbot 설치와 갱신 스케줄 | 사이트에서 HTTPS를 고르면 **Let's Encrypt 발급·적용·갱신**까지 자동 |
 | 로그 | 서버에 접속해 `tail` | 사이트별 access/error 로그를 **화면에서 검색·실시간 보기** |
-| 권한 | 서버 계정 공유 | 관리자와 멤버 역할, 멤버는 **담당 사이트만** 관리, **모든 변경은 감사 로그**에 기록 |
+| 권한 | 서버 계정 공유 | 관리자와 멤버 역할, 멤버는 **담당 사이트만** 관리, **모든 변경은 감사 로그**에 기록, 로그인 **2단계 인증(TOTP)** |
 
 ## 서버에 설치하기
 
@@ -72,6 +72,7 @@ curl -fsSL https://github.com/nginx-manager/app/releases/latest/download/install
 | `NGINX_HTTP_PORT`, `NGINX_HTTPS_PORT` | `80`, `443` | 앞단 프록시가 있어 80/443을 쓸 수 없을 때 |
 | `NGINX_BIND_ADDRESS` | `0.0.0.0` | nginx를 특정 IP에만 열 때 |
 | `NGINX_MANAGER_BACKUP_KEEP` | `14` | `nm backup` 보관 개수 |
+| `NGINX_MANAGER_BACKUP_AT` | `03:30` | 매일 자동 백업 시각. `off`면 끕니다. 바꾼 뒤 `sudo ./nm backup-schedule` |
 | `TZ` | `Asia/Seoul` | 시간대 |
 | `NGINX_MANAGER_IMPORT_ROOTS` | 비움 | `/etc/nginx` 밖의 설정 파일을 가져올 때 |
 | `SPRING_MAIL_*` | 비움 | 메일 알림에 쓸 SMTP 서버 |
@@ -84,7 +85,9 @@ cd /opt/nginx-manager
 ./nm restart           # .env를 고친 뒤 다시 띄우기
 ./nm upgrade           # 관리 화면만 새 버전으로 (nginx는 계속 트래픽을 받습니다)
 ./nm upgrade --nginx   # nginx도 새 버전으로 (새 nginx로 설정을 먼저 검증, 몇 초 재시작)
-./nm backup            # 설정과 데이터베이스 백업
+./nm backup            # 설정과 데이터베이스 백업 (매일 03:30에 자동으로도 돕니다)
+./nm backup-schedule   # 자동 백업 시각을 .env에 맞춰 다시 깔기
+./nm reset-2fa <아이디> # 휴대폰을 잃은 관리자의 2단계 인증 끄기
 ./nm restore backups/<파일>
 ./nm migrate           # v1.0·v1.1에서 옮겨 오기 (먼저 --no-start로 설치)
 ./nm import-root check # 가져올 디렉터리를 읽을 수 있는지 확인 (안 되면 grant로 읽기 권한)
@@ -96,13 +99,13 @@ cd /opt/nginx-manager
 
 ### 사이트를 폼으로
 
-백엔드 여러 개(부하 분산), 웹소켓, 타임아웃, 리디렉션, HTTP/3까지 폼에서 정하고, 만들어질 nginx 설정을 옆에서 바로 봅니다. 폼으로 표현하지 않는 설정은 원문 편집기(nginx 문법 강조)로 고칩니다. 쓰지 않는 사이트는 지우고(v1.3.0), 삭제도 초안 → 적용을 거칩니다.
+백엔드 여러 개(부하 분산), 웹소켓, 타임아웃, 리디렉션, HTTP/3까지 폼에서 정하고, 만들어질 nginx 설정을 옆에서 바로 봅니다. PHP(PHP-FPM) 사이트와 gRPC 프록시(`grpc://`)도 폼으로 만들고, oauth2-proxy·Authelia 같은 외부 인증 서버(auth_request)를 사이트 앞에 둡니다(v1.4.0). 폼으로 표현하지 않는 설정은 Raw 편집기(nginx 문법 강조)로 고칩니다. 쓰지 않는 사이트는 지우고, 삭제도 적용 대기 → 적용을 거칩니다.
 
 <p align="center"><img src="images/site-form.png" alt="사이트 추가 폼과 설정 미리보기" width="860" /></p>
 
 ### 쓰던 설정 파일 가져오기
 
-`/home/*/nginx/*.conf`처럼 경로 패턴을 등록하면 맞는 파일을 모두 찾아 한꺼번에 사이트로 등록합니다. 폼으로 옮길 수 있으면 폼 사이트로, 아니면 원문 그대로 등록하고, 원본이 바뀌면 알려 줍니다.
+`/home/*/nginx/*.conf`처럼 경로 패턴을 등록하면 맞는 파일을 모두 찾아 한꺼번에 사이트로 등록합니다. 폼으로 옮길 수 있으면 폼 사이트로, 아니면 Raw 사이트로 등록하고, 원본이 바뀌면 알려 줍니다.
 
 <p align="center"><img src="images/import-scan.png" alt="설정 파일 가져오기" width="860" /></p>
 
@@ -114,27 +117,31 @@ cd /opt/nginx-manager
 
 ### 확인하고 적용하기
 
-저장한 초안은 파일별 diff로 확인한 뒤 반영합니다. 검증·reload·상태 확인 중 하나라도 실패하면 직전 설정으로 돌아갑니다.
+저장한 변경은 적용 대기로 남고, 파일별 diff로 확인한 뒤 반영합니다. `nginx -t`·reload·헬스 체크 중 하나라도 실패하면 직전 설정으로 자동 롤백합니다.
 
 <p align="center"><img src="images/apply-diff.png" alt="적용 전 변경 내용" width="860" /></p>
 
-### 이력과 되돌리기
+### 이력과 롤백
 
-적용할 때마다 버전이 남고, 두 버전을 비교하거나 이전 버전으로 되돌립니다. 사이트 화면에서 그 사이트가 바뀐 버전만 모아 보고, 멤버도 담당 사이트의 이력을 봅니다. 같은 내용은 한 번만 저장해 버전이 쌓여도 DB가 크게 늘지 않습니다(v1.3.0).
+적용할 때마다 버전이 남고, 두 버전을 diff로 비교하거나 이전 버전으로 롤백합니다. 사이트 화면에서 그 사이트가 바뀐 버전만 모아 보고, 멤버도 담당 사이트의 이력을 봅니다. 같은 내용은 한 번만 저장해 버전이 쌓여도 DB가 크게 늘지 않습니다(v1.3.0).
 
 <p align="center"><img src="images/version-diff.png" alt="두 버전 비교" width="860" /></p>
 
 ### HTTPS 인증서
 
-Let's Encrypt 인증서를 자동으로 받고 만료 전에 갱신합니다. 갱신에 실패하면 메일·웹훅으로 알립니다. 와일드카드·사내 인증서는 업로드합니다. 설정 파일 가져오기로 들여온 원문 사이트도 인증서를 받아 443 server 블록과 80→443 넘기기를 초안으로 더합니다(v1.2.3).
+Let's Encrypt 인증서를 자동으로 받고 만료 전에 갱신합니다. 갱신에 실패하면 메일·웹훅으로 알립니다. 와일드카드·사내 인증서는 업로드합니다. 설정 파일 가져오기로 들여온 Raw 사이트도 인증서를 발급하고 443 server 블록과 80→443 리다이렉트를 적용 대기로 더합니다.
 
 <p align="center"><img src="images/certs.png" alt="인증서 목록" width="860" /></p>
 
 ### 로그
 
-사이트별 access/error 로그를 검색하거나 실시간으로 봅니다. 가져온 원문 사이트의 로그와 밀려난 지난 로그도 읽습니다(v1.3.0).
+사이트별 access/error 로그를 검색하거나 실시간으로 봅니다. 가져온 Raw 사이트의 로그와 로테이트된 지난 로그도 읽습니다.
 
 <p align="center"><img src="images/logs.png" alt="사이트 로그 보기" width="860" /></p>
+
+### 로그인 보호와 자동 백업
+
+내 계정에서 인증 앱(TOTP) 2단계 인증을 켜면 비밀번호 다음에 6자리 코드를 넣어야 들어옵니다. 휴대폰을 잃으면 복구 코드나 관리자 해제, 서버의 `nm reset-2fa`로 풉니다. 서버는 매일 자동으로 백업하고, 대시보드에서 마지막 백업 시각과 실패를 확인합니다(v1.4.0).
 
 ### 4개 언어와 다크 모드
 
@@ -177,5 +184,5 @@ Let's Encrypt 인증서를 자동으로 받고 만료 전에 갱신합니다. �
 | v1.2.1 | 2026-10-30 | 관리 도메인 점검(`nm check-domain`), 인증서를 받으면 바로 HTTPS, 적용 실패 이유를 화면에 표시, Certbot 인증서를 그대로 쓰기(`/etc/letsencrypt` 붙이기, `nm reload`) | [v1.2.1](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.2.1.md) |
 | v1.2.0 | 2026-10-30 | 서버에 한 줄로 설치(`install.sh`, `nm` 명령, 관리 도메인 HTTPS, `nm import-root`), 사용자별 사이트 관리(관리자·멤버 역할, 사이트 담당자), 새 로그인·최초 설정 화면, 관리 화면 안에서 보는 사용 설명서 13장, 브라우저 탭 아이콘 | [v1.2.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.2.0.md) |
 | v1.1.0 | 2026-10-29 | 쓰던 nginx 설정 파일을 사이트로 가져오기: 경로 패턴(`/home/*/nginx/*.conf`)으로 찾아 한꺼번에 등록, 폼/원문 자동 판단, 원본 바뀜 알림과 다시 가져오기. 화면 다듬기: 고른 유형만 보이는 사이트 폼, 놓치지 않는 미리보기, 대상이 보이는 사이트 목록, 접히는 적용 diff, 휴대폰 메뉴 버튼 | [v1.1.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.1.0.md) |
-| v1.0.0 | 2026-10-29 | 첫 정식 릴리스: 폼으로 사이트·TCP/UDP 스트림 만들기, 검증 후 적용과 자동 복구, 이력·비교·되돌리기, Let's Encrypt 자동 발급·갱신, 대시보드와 로그, 4개 언어·다크 모드, 사용자·감사 로그, 컨테이너 두 개와 업그레이드 안전장치 | [v1.0.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.0.0.md) |
+| v1.0.0 | 2026-10-29 | 첫 정식 릴리스: 폼으로 사이트·TCP/UDP 스트림 만들기, 검증 후 적용과 자동 복구, 이력·비교·롤백, Let's Encrypt 자동 발급·갱신, 대시보드와 로그, 4개 언어·다크 모드, 사용자·감사 로그, 컨테이너 두 개와 업그레이드 안전장치 | [v1.0.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.0.0.md) |
 <!-- releases:end -->
