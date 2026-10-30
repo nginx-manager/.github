@@ -99,7 +99,7 @@ cd /opt/nginx-manager
 
 ### 用表单创建站点
 
-多个后端（负载均衡）、WebSocket、超时、重定向乃至 HTTP/3 都能在表单里设置，旁边即时显示生成的 nginx 配置。PHP（PHP-FPM）站点和 gRPC 代理（`grpc://`）也能用表单创建，还可以在站点前放置 oauth2-proxy、Authelia 等外部认证服务器（auth_request）（v1.4.0）。把 `/api/` 发往后端、`/files/` 指向目录的按路径路由，以及备用上游、故障判定和 keepalive 也能在表单中设置（v1.5.0）。CORS、CSP 等响应头、发往后端的头部以及 `www` 到主域名的 301 也能在表单中设置，相似的站点可用**复制**沿用设置，只需填写新域名（v1.6.0）。表单覆盖不到的配置，可在带 nginx 语法高亮的 Raw 编辑器中修改。不再使用的站点可以删除，删除同样经过待应用 → 应用。
+多个后端（负载均衡）、WebSocket、超时、重定向乃至 HTTP/3 都能在表单里设置，旁边即时显示生成的 nginx 配置。PHP（PHP-FPM）站点和 gRPC 代理（`grpc://`）也能用表单创建，还可以在站点前放置 oauth2-proxy、Authelia 等外部认证服务器（auth_request）（v1.4.0）。把 `/api/` 发往后端、`/files/` 指向目录的按路径路由，以及备用上游、故障判定和 keepalive 也能在表单中设置（v1.5.0）。CORS、CSP 等响应头、发往后端的头部以及 `www` 到主域名的 301 也能在表单中设置，相似的站点可用**复制**沿用设置，只需填写新域名（v1.6.0）。后端宕机时显示提示页面，而不是 nginx 默认的 502 页面；站点列表可按域名或目标搜索，并按状态筛选（v1.7.0）。表单覆盖不到的配置，可在带 nginx 语法高亮的 Raw 编辑器中修改。不再使用的站点可以删除，删除同样经过待应用 → 应用。
 
 <p align="center"><img src="images/site-form.png" alt="添加站点表单与配置预览" width="860" /></p>
 
@@ -111,7 +111,7 @@ cd /opt/nginx-manager
 
 ### TCP/UDP 流
 
-数据库、MQTT 等非 HTTP 服务也能按端口转发。
+数据库、MQTT 等非 HTTP 服务也能按端口转发。可以设置允许或拒绝的 IP、CIDR，让数据库、SSH 端口只对办公室地址开放，并通过 PROXY protocol 把真实客户端 IP 传给后端（v1.7.0）。
 
 <p align="center"><img src="images/stream-form.png" alt="添加流表单" width="860" /></p>
 

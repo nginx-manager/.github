@@ -99,7 +99,7 @@ Details are in [chapter 1 of the user guide, Installation](https://github.com/ng
 
 ### Sites from a form
 
-Set multiple backends (load balancing), WebSocket, timeouts, redirects and even HTTP/3 in a form, and see the generated nginx config right beside it. PHP (PHP-FPM) sites and gRPC proxies (`grpc://`) come from the form too, and an external auth server (auth_request) such as oauth2-proxy or Authelia can guard a site (v1.4.0). Path routing (`/api/` to a backend, `/files/` to a directory), backup upstreams, failure detection and keepalive are set in the form too (v1.5.0). Custom response headers such as CORS or CSP, headers sent to the backend and a 301 from `www` to the primary domain come from the form as well, and **Duplicate** copies a site so a similar one only needs a new domain (v1.6.0). Anything the form doesn't cover can be edited in the Raw editor with nginx syntax highlighting. Delete sites you no longer need; deletion is also a pending change you apply.
+Set multiple backends (load balancing), WebSocket, timeouts, redirects and even HTTP/3 in a form, and see the generated nginx config right beside it. PHP (PHP-FPM) sites and gRPC proxies (`grpc://`) come from the form too, and an external auth server (auth_request) such as oauth2-proxy or Authelia can guard a site (v1.4.0). Path routing (`/api/` to a backend, `/files/` to a directory), backup upstreams, failure detection and keepalive are set in the form too (v1.5.0). Custom response headers such as CORS or CSP, headers sent to the backend and a 301 from `www` to the primary domain come from the form as well, and **Duplicate** copies a site so a similar one only needs a new domain (v1.6.0). When a backend is down, visitors see a friendly notice page instead of nginx's default 502, and the site list can be searched by domain or target and filtered by status (v1.7.0). Anything the form doesn't cover can be edited in the Raw editor with nginx syntax highlighting. Delete sites you no longer need; deletion is also a pending change you apply.
 
 <p align="center"><img src="images/site-form.png" alt="Site form with config preview" width="860" /></p>
 
@@ -111,7 +111,7 @@ Register a path pattern such as `/home/*/nginx/*.conf` and every matching file i
 
 ### TCP/UDP streams
 
-Forward non-HTTP services such as databases or MQTT by port.
+Forward non-HTTP services such as databases or MQTT by port. Allow or deny IPs and CIDRs to open a database or SSH port only to your office, and pass the real client IP to the backend with the PROXY protocol (v1.7.0).
 
 <p align="center"><img src="images/stream-form.png" alt="Stream form" width="860" /></p>
 
