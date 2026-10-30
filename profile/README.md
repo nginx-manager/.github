@@ -1,5 +1,7 @@
 <div align="center">
 
+**한국어** · [English](README.en.md) · [日本語](README.ja.md) · [简体中文](README.zh-CN.md)
+
 # nginx manager
 
 **설정 파일을 직접 고치다 사이트를 내리는 일은 이제 그만. 브라우저에서 확인하고 적용하고, 실패하면 알아서 되돌립니다.**
@@ -10,7 +12,7 @@ nginx와 관리 화면을 컨테이너 두 개로 띄우는 웹 기반 nginx 관
 [![nginx](https://img.shields.io/badge/nginx-1.31.8-009639.svg)](https://nginx.org/en/CHANGES)
 [![Languages](https://img.shields.io/badge/UI-%ED%95%9C%EA%B5%AD%EC%96%B4%20%C2%B7%20English%20%C2%B7%20%E6%97%A5%E6%9C%AC%E8%AA%9E%20%C2%B7%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-0ea5e9.svg)](#4개-언어와-다크-모드)
 
-[빠르게 시작하기](#빠르게-시작하기) · [주요 기능](#주요-기능) · [릴리스 노트](https://github.com/nginx-manager/app/blob/main/docs/releases/README.md) · [저장소](https://github.com/nginx-manager/app)
+[서버에 설치하기](#서버에-설치하기) · [주요 기능](#주요-기능) · [릴리스 노트](https://github.com/nginx-manager/app/blob/main/docs/releases/README.md) · [저장소](https://github.com/nginx-manager/app)
 
 </div>
 
@@ -21,7 +23,7 @@ nginx와 관리 화면을 컨테이너 두 개로 띄우는 웹 기반 nginx 관
 ## 목차
 
 - [왜 nginx manager인가](#왜-nginx-manager인가)
-- [빠르게 시작하기](#빠르게-시작하기)
+- [서버에 설치하기](#서버에-설치하기)
 - [주요 기능](#주요-기능)
 - [구성](#구성)
 - [저장소](#저장소)
@@ -36,16 +38,59 @@ nginx와 관리 화면을 컨테이너 두 개로 띄우는 웹 기반 nginx 관
 | 이력 | 백업 파일을 직접 관리 | 적용할 때마다 **버전**이 남고 비교·되돌리기, 서버에서 직접 바뀐 파일도 감지 |
 | HTTPS | certbot 설치와 갱신 스케줄 | 사이트에서 HTTPS를 고르면 **Let's Encrypt 발급·적용·갱신**까지 자동 |
 | 로그 | 서버에 접속해 `tail` | 사이트별 access/error 로그를 **화면에서 검색·실시간 보기** |
-| 권한 | 서버 계정 공유 | 관리자·편집자·조회자 역할, **모든 변경은 감사 로그**에 기록 |
+| 권한 | 서버 계정 공유 | 관리자와 멤버 역할, 멤버는 **담당 사이트만** 관리, **모든 변경은 감사 로그**에 기록 |
 
-## 빠르게 시작하기
+## 서버에 설치하기
+
+준비물: Docker Engine과 Compose v2, sudo 권한, 비어 있는 80·443 포트. 관리 도메인을 쓰려면 그 도메인의 DNS가 서버를 가리키고 80번 포트가 인터넷에 열려 있어야 합니다.
+
+아래 한 줄로 `/opt/nginx-manager`에 설치하고 바로 띄웁니다.
 
 ```bash
-curl -fsSLO https://raw.githubusercontent.com/nginx-manager/app/main/docker/docker-compose.yml
-docker compose up -d
+curl -fsSL https://github.com/nginx-manager/app/releases/latest/download/install.sh \
+  | sudo sh -s -- --admin-domain nm.example.com --email ops@example.com
 ```
 
-`http://<호스트>:9000`에 접속하면 최초 관리자 계정을 만드는 화면이 나옵니다. 처음 시작할 때 `/etc/nginx`에 이미 있는 설정을 가져와 첫 버전으로 남깁니다. 관리 화면은 인터넷에 그대로 열지 말고 사내망·VPN이나 HTTPS 프록시 뒤에 두세요.
+- `--admin-domain`을 주면 그 도메인으로 관리 화면을 엽니다. Let's Encrypt 인증서를 받고, 80은 443으로 넘기며, 관리 화면은 HTTPS로만 열립니다.
+- 도메인 없이 설치하면 관리 화면은 서버 안의 `http://127.0.0.1:9000`에만 열립니다. 내 PC에서 `ssh -L 9000:127.0.0.1:9000 <서버>`로 연결한 뒤 `http://localhost:9000`을 엽니다.
+- 처음 접속하면 최초 관리자 계정을 만드는 화면이 나옵니다.
+- 서버에 있던 `/home/*/nginx` 설정을 가져오려면 `--import-root /home`을 붙여 설치하세요. 설치한 뒤에는 `./nm import-root add /home`으로 붙입니다.
+- 그 밖의 옵션: `--version X.Y.Z`(버전 고정), `--dir`(설치 위치), `--http-port`, `--https-port`, `--manager-port`, `--bundle FILE`(인터넷이 안 되는 서버).
+
+### 설정 (`/opt/nginx-manager/.env`)
+
+설치하면 `/opt/nginx-manager/.env`가 만들어집니다. 고친 뒤에는 `./nm restart`로 다시 띄우고, nginx 포트를 바꿨다면 `./nm restart nginx`를 실행합니다.
+
+| 변수 | 기본 | 언제 바꾸나 |
+| --- | --- | --- |
+| `MANAGER_VERSION`, `NGINX_IMAGE` | 설치한 버전 | 직접 고치지 않습니다. `nm upgrade`가 바꿉니다 |
+| `NGINX_MANAGER_ADMIN_DOMAIN` | 비움 | 관리 화면을 `https://도메인`으로 열 때 |
+| `NGINX_MANAGER_ADMIN_EMAIL` | 비움 | Let's Encrypt 연락 이메일 |
+| `NGINX_MANAGER_ADMIN_ALLOW` | 비움(모두 허용) | 관리 도메인에 들어올 수 있는 주소를 CIDR로 제한할 때 |
+| `NGINX_MANAGER_PORT` | `9000` | 9000번 포트를 이미 쓰고 있을 때 |
+| `NGINX_MANAGER_BIND_ADDRESS` | `127.0.0.1` | 도메인 없이 사내망에서 열 때(`0.0.0.0`이나 사내 IP) |
+| `NGINX_HTTP_PORT`, `NGINX_HTTPS_PORT` | `80`, `443` | 앞단 프록시가 있어 80/443을 쓸 수 없을 때 |
+| `NGINX_BIND_ADDRESS` | `0.0.0.0` | nginx를 특정 IP에만 열 때 |
+| `NGINX_MANAGER_BACKUP_KEEP` | `14` | `nm backup` 보관 개수 |
+| `TZ` | `Asia/Seoul` | 시간대 |
+| `NGINX_MANAGER_IMPORT_ROOTS` | 비움 | `/etc/nginx` 밖의 설정 파일을 가져올 때 |
+| `SPRING_MAIL_*` | 비움 | 메일 알림에 쓸 SMTP 서버 |
+
+### 운영 명령
+
+```bash
+cd /opt/nginx-manager
+./nm status            # 상태와 버전
+./nm restart           # .env를 고친 뒤 다시 띄우기
+./nm upgrade           # 관리 화면만 새 버전으로 (nginx는 계속 트래픽을 받습니다)
+./nm upgrade --nginx   # nginx도 새 버전으로 (새 nginx로 설정을 먼저 검증, 몇 초 재시작)
+./nm backup            # 설정과 데이터베이스 백업
+./nm restore backups/<파일>
+./nm migrate           # v1.0·v1.1에서 옮겨 오기 (먼저 --no-start로 설치)
+./nm import-root check # 가져올 디렉터리를 읽을 수 있는지 확인 (안 되면 grant로 읽기 권한)
+```
+
+자세한 내용은 [사용 설명서 1장 설치와 실행](https://github.com/nginx-manager/app/blob/main/src/main/resources/guide/ko/01-install.md)에 있습니다.
 
 ## 주요 기능
 
@@ -95,7 +140,7 @@ Let's Encrypt 인증서를 자동으로 받고 만료 전에 갱신합니다. �
 
 화면을 한국어·영어·일본어·중국어(간체)로 볼 수 있고, 어두운 테마로 바꿀 수 있습니다.
 
-<p align="center"><img src="images/dashboard-en.png" alt="영어 화면" width="860" /></p>
+<p align="center"><img src="images/sites-en.png" alt="영어로 본 사이트 목록" width="860" /></p>
 
 ## 구성
 
@@ -110,7 +155,7 @@ Let's Encrypt 인증서를 자동으로 받고 만료 전에 갱신합니다. �
 
 | 저장소 | 설명 |
 | --- | --- |
-| [app](https://github.com/nginx-manager/app) | 관리 화면(Spring Boot), nginx 이미지와 에이전트(Go), compose 파일, 릴리스 노트 |
+| [app](https://github.com/nginx-manager/app) | 관리 화면(Spring Boot), nginx 이미지와 에이전트(Go), 설치 묶음, 릴리스 노트 |
 
 ## 릴리스
 
