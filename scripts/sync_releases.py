@@ -1,16 +1,19 @@
 """조직 소개(profile/README.md와 언어별 README.<언어>.md)의 릴리스 표와 배지를 app 저장소 릴리스 노트에 맞춘다.
 
-원천은 nginx-manager/app main의 docs/releases/README.md 표다. 날짜가 적힌(출시한) 줄만 가져오고,
+원천은 nginx-manager/app main의 docs/releases/README.md 표다. 날짜가 적혀 있고 GitHub Release도 게시된 줄만 가져오고,
 맨 위 줄을 최신 버전으로 보고 release 배지와 그 노트의 nginx 버전으로 nginx 배지를 바꾼다.
 표는 README의 <!-- releases:start --> 와 <!-- releases:end --> 사이를 통째로 다시 쓴다.
 노트 목록의 "주요 내용"은 한국어라 한국어 README에만 넣고, 다른 언어 README에는 버전·날짜·노트 링크만 넣는다.
 사용: python3 scripts/sync_releases.py profile/README.md profile/README.en.md ...
 """
+import json
+import os
 import re
 import sys
 import urllib.request
 
 RAW = "https://raw.githubusercontent.com/nginx-manager/app/main/docs/releases/"
+RELEASES_API = "https://api.github.com/repos/nginx-manager/app/releases?per_page=100"
 BLOB = "https://github.com/nginx-manager/app/blob/main/docs/releases/"
 HEADER = "| 버전 | 날짜 | 주요 내용 | 릴리스 노트 |\n| --- | --- | --- | --- |"
 # 한국어 밖의 README: 파일 이름의 언어(README.en.md → en)로 표 머리를 고른다
@@ -25,6 +28,17 @@ READMES = sys.argv[1:] or ["profile/README.md"]
 def fetch(name):
     with urllib.request.urlopen(RAW + name, timeout=30) as res:
         return res.read().decode("utf-8")
+
+
+def published_tags():
+    """GitHub Release로 게시된 태그. 노트에 날짜를 먼저 적어 두어도 Release가 나오기 전에는 표에 넣지 않는다."""
+    req = urllib.request.Request(RELEASES_API, headers={"Accept": "application/vnd.github+json"})
+    token = os.environ.get("GH_TOKEN")
+    if token:
+        req.add_header("Authorization", "Bearer " + token)
+    with urllib.request.urlopen(req, timeout=30) as res:
+        releases = json.load(res)
+    return {r["tag_name"] for r in releases if not r.get("draft") and not r.get("prerelease")}
 
 
 def released_rows(notes_index):
@@ -66,7 +80,8 @@ def sync(path, rows, latest, nginx):
 
 
 def main():
-    rows = released_rows(fetch("README.md"))
+    tags = published_tags()
+    rows = [r for r in released_rows(fetch("README.md")) if r[0] in tags]
     if not rows:
         print("no released version in the notes index; nothing to do")
         return
