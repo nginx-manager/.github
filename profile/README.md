@@ -6,8 +6,8 @@
 
 nginx와 관리 화면을 컨테이너 두 개로 띄우는 웹 기반 nginx 관리도구
 
-[![Release](https://img.shields.io/badge/release-v1.0.0%20%EC%A4%80%EB%B9%84%20%EC%A4%91-f59e0b.svg)](https://github.com/nginx-manager/app/blob/main/docs/releases/README.md)
-[![nginx](https://img.shields.io/badge/nginx-1.31.6-009639.svg)](https://nginx.org/en/CHANGES)
+[![Release](https://img.shields.io/badge/release-v1.1.0-10b981.svg)](https://github.com/nginx-manager/app/releases/tag/v1.1.0)
+[![nginx](https://img.shields.io/badge/nginx-1.31.8-009639.svg)](https://nginx.org/en/CHANGES)
 [![Languages](https://img.shields.io/badge/UI-%ED%95%9C%EA%B5%AD%EC%96%B4%20%C2%B7%20English%20%C2%B7%20%E6%97%A5%E6%9C%AC%E8%AA%9E%20%C2%B7%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-0ea5e9.svg)](#4개-언어와-다크-모드)
 
 [빠르게 시작하기](#빠르게-시작하기) · [주요 기능](#주요-기능) · [릴리스 노트](https://github.com/nginx-manager/app/blob/main/docs/releases/README.md) · [저장소](https://github.com/nginx-manager/app)
@@ -54,6 +54,12 @@ docker compose up -d
 백엔드 여러 개(부하 분산), 웹소켓, 타임아웃, 리디렉션, HTTP/3까지 폼에서 정하고, 만들어질 nginx 설정을 옆에서 바로 봅니다. 폼으로 표현하지 않는 설정은 원문 편집기(nginx 문법 강조)로 고칩니다.
 
 <p align="center"><img src="images/site-form.png" alt="사이트 추가 폼과 설정 미리보기" width="860" /></p>
+
+### 쓰던 설정 파일 가져오기
+
+`/home/*/nginx/*.conf`처럼 경로 패턴을 등록하면 맞는 파일을 모두 찾아 한꺼번에 사이트로 등록합니다. 폼으로 옮길 수 있으면 폼 사이트로, 아니면 원문 그대로 등록하고, 원본이 바뀌면 알려 줍니다.
+
+<p align="center"><img src="images/import-scan.png" alt="설정 파일 가져오기" width="860" /></p>
 
 ### TCP/UDP 스트림
 
@@ -108,8 +114,11 @@ Let's Encrypt 인증서를 자동으로 받고 만료 전에 갱신합니다. �
 
 ## 릴리스
 
-버전은 git 태그(`vX.Y.Z`)로 관리하고, 1.0.0부터 시작합니다. 버전마다 [릴리스 노트](https://github.com/nginx-manager/app/blob/main/docs/releases/README.md)에 바뀐 내용과 화면을 정리합니다. 지금 쓰는 버전은 관리 화면 아래(footer)에 보입니다.
+버전은 git 태그(`vX.Y.Z`)로 관리하고, 1.0.0부터 시작합니다. 버전마다 [릴리스 노트](https://github.com/nginx-manager/app/blob/main/docs/releases/README.md)에 바뀐 내용과 화면을 정리하고, [GitHub Releases](https://github.com/nginx-manager/app/releases)에도 올립니다. 지금 쓰는 버전은 관리 화면 아래(footer)에 보입니다.
 
+<!-- releases:start -->
 | 버전 | 날짜 | 주요 내용 | 릴리스 노트 |
 | --- | --- | --- | --- |
-| v1.0.0 | 출시 예정 | 첫 정식 릴리스: 폼으로 사이트·TCP/UDP 스트림 만들기, 검증 후 적용과 자동 복구, 이력·비교·되돌리기, Let's Encrypt 자동 발급·갱신, 대시보드와 로그, 4개 언어·다크 모드, 사용자·감사 로그, 컨테이너 두 개와 업그레이드 안전장치 | [초안 보기](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.0.0.md) |
+| v1.1.0 | 2026-10-29 | 쓰던 nginx 설정 파일을 사이트로 가져오기: 경로 패턴(`/home/*/nginx/*.conf`)으로 찾아 한꺼번에 등록, 폼/원문 자동 판단, 원본 바뀜 알림과 다시 가져오기. 화면 다듬기: 고른 유형만 보이는 사이트 폼, 놓치지 않는 미리보기, 대상이 보이는 사이트 목록, 접히는 적용 diff, 휴대폰 메뉴 버튼 | [v1.1.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.1.0.md) |
+| v1.0.0 | 2026-10-29 | 첫 정식 릴리스: 폼으로 사이트·TCP/UDP 스트림 만들기, 검증 후 적용과 자동 복구, 이력·비교·되돌리기, Let's Encrypt 자동 발급·갱신, 대시보드와 로그, 4개 언어·다크 모드, 사용자·감사 로그, 컨테이너 두 개와 업그레이드 안전장치 | [v1.0.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.0.0.md) |
+<!-- releases:end -->

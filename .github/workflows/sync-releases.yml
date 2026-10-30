@@ -1,0 +1,30 @@
+name: Sync releases
+
+# app 저장소에서 릴리스(태그와 릴리스 노트)를 내면 조직 소개의 릴리스 표와 배지를 맞춘다.
+# 다른 저장소의 이벤트는 토큰 없이 받을 수 없어서, 한 시간마다 노트 목록을 읽어 바뀐 것이 있을 때만 커밋한다.
+# 바로 반영하려면 Actions에서 Run workflow를 누른다.
+
+on:
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/sync_releases.py profile/README.md
+      - name: Commit when changed
+        run: |
+          if git diff --quiet; then
+            echo "profile is up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git commit -am "조직 소개: 릴리스 표와 배지를 릴리스 노트에 맞춤"
+          git push
