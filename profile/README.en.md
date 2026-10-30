@@ -126,7 +126,7 @@ Every apply is saved as a version. Compare any two versions or roll back to an e
 
 ### HTTPS certificates
 
-Let's Encrypt certificates are issued automatically and renewed before they expire. If a renewal fails, you're alerted by email or webhook. Wildcard and internal certificates can be uploaded.
+Let's Encrypt certificates are issued automatically and renewed before they expire. If a renewal fails, you're alerted by email or webhook. Wildcard and internal certificates can be uploaded. Imported raw-config sites can get a certificate too, with a 443 server block and an 80→443 redirect added as a draft (v1.2.3).
 
 <p align="center"><img src="images/certs.png" alt="Certificate list" width="860" /></p>
 

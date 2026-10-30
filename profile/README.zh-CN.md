@@ -126,7 +126,7 @@ cd /opt/nginx-manager
 
 ### HTTPS 证书
 
-自动申请 Let's Encrypt 证书并在到期前续期。续期失败时通过邮件或 Webhook 通知。通配符证书和内部证书可以上传。
+自动申请 Let's Encrypt 证书并在到期前续期。续期失败时通过邮件或 Webhook 通知。通配符证书和内部证书可以上传。通过导入配置文件加入的原文编辑站点也能申请证书，并以草稿形式加入 443 server 块和 80→443 跳转（v1.2.3）。
 
 <p align="center"><img src="images/certs.png" alt="证书列表" width="860" /></p>
 
