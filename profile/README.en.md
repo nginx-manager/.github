@@ -99,7 +99,7 @@ Details are in [chapter 1 of the user guide, Installation](https://github.com/ng
 
 ### Sites from a form
 
-Set multiple backends (load balancing), WebSocket, timeouts, redirects and even HTTP/3 in a form, and see the generated nginx config right beside it. PHP (PHP-FPM) sites and gRPC proxies (`grpc://`) come from the form too, and an external auth server (auth_request) such as oauth2-proxy or Authelia can guard a site (v1.4.0). Anything the form doesn't cover can be edited in the Raw editor with nginx syntax highlighting. Delete sites you no longer need; deletion is also a pending change you apply.
+Set multiple backends (load balancing), WebSocket, timeouts, redirects and even HTTP/3 in a form, and see the generated nginx config right beside it. PHP (PHP-FPM) sites and gRPC proxies (`grpc://`) come from the form too, and an external auth server (auth_request) such as oauth2-proxy or Authelia can guard a site (v1.4.0). Path routing (`/api/` to a backend, `/files/` to a directory), backup upstreams, failure detection and keepalive are set in the form too (v1.5.0). Anything the form doesn't cover can be edited in the Raw editor with nginx syntax highlighting. Delete sites you no longer need; deletion is also a pending change you apply.
 
 <p align="center"><img src="images/site-form.png" alt="Site form with config preview" width="860" /></p>
 
@@ -138,6 +138,10 @@ Let's Encrypt certificates are issued automatically and renewed before they expi
 Search or live-tail each site's access/error logs. Imported Raw sites and rotated older log files can be read too.
 
 <p align="center"><img src="images/logs.png" alt="Viewing site logs" width="860" /></p>
+
+### Maintenance mode
+
+During a deploy or database work, turn on maintenance mode and apply: visitors get a 503 notice page while the people doing the work get through as usual. Certificate issuance paths stay open (v1.5.0).
 
 ### Sign-in protection and automatic backups
 
