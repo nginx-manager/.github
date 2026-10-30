@@ -96,7 +96,7 @@ cd /opt/nginx-manager
 
 ### 用表单创建站点
 
-多个后端（负载均衡）、WebSocket、超时、重定向乃至 HTTP/3 都能在表单里设置，旁边即时显示生成的 nginx 配置。表单覆盖不到的配置，可在带 nginx 语法高亮的原文编辑器中修改。
+多个后端（负载均衡）、WebSocket、超时、重定向乃至 HTTP/3 都能在表单里设置，旁边即时显示生成的 nginx 配置。表单覆盖不到的配置，可在带 nginx 语法高亮的原文编辑器中修改。不再使用的站点可以删除，删除同样经过草稿 → 应用（v1.2.4）。
 
 <p align="center"><img src="images/site-form.png" alt="添加站点表单与配置预览" width="860" /></p>
 
@@ -120,7 +120,7 @@ cd /opt/nginx-manager
 
 ### 历史与回滚
 
-每次应用都会留下版本，可以比较任意两个版本或回滚到之前的版本。
+每次应用都会留下版本，可以比较任意两个版本或回滚到之前的版本。在站点页面可以只查看改动过该站点的版本，成员也能查看自己负责站点的历史。相同内容只保存一次，版本增多时数据库也不会明显变大（v1.2.4）。
 
 <p align="center"><img src="images/version-diff.png" alt="比较两个版本" width="860" /></p>
 
@@ -132,7 +132,7 @@ cd /opt/nginx-manager
 
 ### 日志
 
-搜索或实时查看每个站点的 access/error 日志。
+搜索或实时查看每个站点的 access/error 日志。也能读取导入的原文编辑站点的日志和轮转后的历史日志（v1.2.4）。
 
 <p align="center"><img src="images/logs.png" alt="查看站点日志" width="860" /></p>
 
