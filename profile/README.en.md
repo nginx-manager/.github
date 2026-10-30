@@ -96,7 +96,7 @@ Details are in [chapter 1 of the user guide, Installation](https://github.com/ng
 
 ### Sites from a form
 
-Set multiple backends (load balancing), WebSocket, timeouts, redirects and even HTTP/3 in a form, and see the generated nginx config right beside it. Anything the form doesn't cover can be edited in the raw editor with nginx syntax highlighting. Delete sites you no longer need; deletion is also a draft you apply (v1.2.4).
+Set multiple backends (load balancing), WebSocket, timeouts, redirects and even HTTP/3 in a form, and see the generated nginx config right beside it. Anything the form doesn't cover can be edited in the raw editor with nginx syntax highlighting. Delete sites you no longer need; deletion is also a draft you apply (v1.3.0).
 
 <p align="center"><img src="images/site-form.png" alt="Site form with config preview" width="860" /></p>
 
@@ -120,7 +120,7 @@ Saved drafts are reviewed as per-file diffs before they go live. If validation, 
 
 ### History and rollback
 
-Every apply is saved as a version. Compare any two versions or roll back to an earlier one. A site's page shows only the versions that changed it, and members can see the history of their own sites. Identical contents are stored once, so the database stays small as versions pile up (v1.2.4).
+Every apply is saved as a version. Compare any two versions or roll back to an earlier one. A site's page shows only the versions that changed it, and members can see the history of their own sites. Identical contents are stored once, so the database stays small as versions pile up (v1.3.0).
 
 <p align="center"><img src="images/version-diff.png" alt="Comparing two versions" width="860" /></p>
 
@@ -132,7 +132,7 @@ Let's Encrypt certificates are issued automatically and renewed before they expi
 
 ### Logs
 
-Search or live-tail each site's access/error logs. Imported raw-config sites and rotated older log files can be read too (v1.2.4).
+Search or live-tail each site's access/error logs. Imported raw-config sites and rotated older log files can be read too (v1.3.0).
 
 <p align="center"><img src="images/logs.png" alt="Viewing site logs" width="860" /></p>
 
