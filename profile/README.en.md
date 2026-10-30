@@ -99,7 +99,7 @@ Details are in [chapter 1 of the user guide, Installation](https://github.com/ng
 
 ### Sites from a form
 
-Set multiple backends (load balancing), WebSocket, timeouts, redirects and even HTTP/3 in a form, and see the generated nginx config right beside it. PHP (PHP-FPM) sites and gRPC proxies (`grpc://`) come from the form too, and an external auth server (auth_request) such as oauth2-proxy or Authelia can guard a site (v1.4.0). Path routing (`/api/` to a backend, `/files/` to a directory), backup upstreams, failure detection and keepalive are set in the form too (v1.5.0). Custom response headers such as CORS or CSP, headers sent to the backend and a 301 from `www` to the primary domain come from the form as well, and **Duplicate** copies a site so a similar one only needs a new domain (v1.6.0). When a backend is down, visitors see a friendly notice page instead of nginx's default 502, and the site list can be searched by domain or target and filtered by status (v1.7.0). Selected sites can be enabled, disabled or assigned an owner at once (v1.8.0). Anything the form doesn't cover can be edited in the Raw editor with nginx syntax highlighting. Delete sites you no longer need; deletion is also a pending change you apply.
+Set multiple backends (load balancing), WebSocket, timeouts, redirects and even HTTP/3 in a form, and see the generated nginx config right beside it. PHP (PHP-FPM) sites and gRPC proxies (`grpc://`) come from the form too, and an external auth server (auth_request) such as oauth2-proxy or Authelia can guard a site (v1.4.0). Path routing (`/api/` to a backend, `/files/` to a directory), backup upstreams, failure detection and keepalive are set in the form too (v1.5.0). Custom response headers such as CORS or CSP, headers sent to the backend and a 301 from `www` to the primary domain come from the form as well, and **Duplicate** copies a site so a similar one only needs a new domain (v1.6.0). When a backend is down, visitors see a friendly notice page instead of nginx's default 502, and the site list can be searched by domain or target and filtered by status (v1.7.0). Selected sites can be enabled, disabled or assigned an owner at once (v1.8.0). Each site can carry a note such as the owning team, shown in the list and searchable, and admins can append directives the form doesn't cover to the server block (v1.9.0). Anything the form doesn't cover can be edited in the Raw editor with nginx syntax highlighting. Delete sites you no longer need; deletion is also a pending change you apply.
 
 <p align="center"><img src="images/site-form.png" alt="Site form with config preview" width="860" /></p>
 
@@ -149,7 +149,7 @@ Turn on two-factor authentication with an authenticator app (TOTP) in your accou
 
 ### Operational alerts and audit log
 
-Besides certificate problems, failed applies, nginx going down or restarting, config files changed directly on the server, failed backups and locked accounts are sent by email or webhook (Slack compatible), and each channel chooses what it receives. The filtered audit log downloads as CSV (v1.8.0).
+Besides certificate problems, failed applies, nginx going down or restarting, config files changed directly on the server, failed backups and locked accounts are sent by email or webhook (Slack compatible), and each channel chooses what it receives. The filtered audit log downloads as CSV (v1.8.0). With an API token, CI and deploy scripts turn maintenance mode on and off and apply changes with a single `curl` (v1.9.0).
 
 ### Four languages and dark mode
 
