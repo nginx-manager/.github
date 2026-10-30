@@ -8,7 +8,7 @@
 
 A web-based nginx manager that runs nginx and its admin UI as two containers
 
-[![Release](https://img.shields.io/badge/release-v1.2.3-10b981.svg)](https://github.com/nginx-manager/app/releases/tag/v1.2.3)
+[![Release](https://img.shields.io/badge/release-v1.4.0-10b981.svg)](https://github.com/nginx-manager/app/releases/tag/v1.4.0)
 [![nginx](https://img.shields.io/badge/nginx-1.31.8-009639.svg)](https://nginx.org/en/CHANGES)
 [![Languages](https://img.shields.io/badge/UI-%ED%95%9C%EA%B5%AD%EC%96%B4%20%C2%B7%20English%20%C2%B7%20%E6%97%A5%E6%9C%AC%E8%AA%9E%20%C2%B7%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-0ea5e9.svg)](#four-languages-and-dark-mode)
 
@@ -164,6 +164,8 @@ Versions follow git tags (`vX.Y.Z`), starting at 1.0.0. Each version's changes a
 <!-- releases:start -->
 | Version | Date | Release notes |
 | --- | --- | --- |
+| v1.4.0 | 2026-10-30 | [v1.4.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.4.0.md) |
+| v1.3.0 | 2026-10-30 | [v1.3.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.3.0.md) |
 | v1.2.3 | 2026-10-30 | [v1.2.3](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.2.3.md) |
 | v1.2.2 | 2026-10-30 | [v1.2.2](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.2.2.md) |
 | v1.2.1 | 2026-10-30 | [v1.2.1](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.2.1.md) |
