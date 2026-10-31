@@ -8,7 +8,7 @@
 
 用两个容器运行 nginx 和管理界面的 Web 版 nginx 管理工具
 
-[![Release](https://img.shields.io/badge/release-v1.9.0-10b981.svg)](https://github.com/nginx-manager/app/releases/tag/v1.9.0)
+[![Release](https://img.shields.io/badge/release-v1.9.1-10b981.svg)](https://github.com/nginx-manager/app/releases/tag/v1.9.1)
 [![nginx](https://img.shields.io/badge/nginx-1.31.8-009639.svg)](https://nginx.org/en/CHANGES)
 [![Languages](https://img.shields.io/badge/UI-%ED%95%9C%EA%B5%AD%EC%96%B4%20%C2%B7%20English%20%C2%B7%20%E6%97%A5%E6%9C%AC%E8%AA%9E%20%C2%B7%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-0ea5e9.svg)](#四种语言和深色模式)
 
@@ -164,6 +164,7 @@ cd /opt/nginx-manager
 <!-- releases:start -->
 | 版本 | 日期 | 发行说明 |
 | --- | --- | --- |
+| v1.9.1 | 2026-10-31 | [v1.9.1](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.9.1.md) |
 | v1.9.0 | 2026-10-30 | [v1.9.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.9.0.md) |
 | v1.8.0 | 2026-10-30 | [v1.8.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.8.0.md) |
 | v1.7.0 | 2026-10-30 | [v1.7.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.7.0.md) |
