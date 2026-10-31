@@ -8,7 +8,7 @@
 
 nginx와 관리 화면을 컨테이너 두 개로 띄우는 웹 기반 nginx 관리도구
 
-[![Release](https://img.shields.io/badge/release-v1.9.1-10b981.svg)](https://github.com/nginx-manager/app/releases/tag/v1.9.1)
+[![Release](https://img.shields.io/badge/release-v1.9.2-10b981.svg)](https://github.com/nginx-manager/app/releases/tag/v1.9.2)
 [![nginx](https://img.shields.io/badge/nginx-1.31.8-009639.svg)](https://nginx.org/en/CHANGES)
 [![Languages](https://img.shields.io/badge/UI-%ED%95%9C%EA%B5%AD%EC%96%B4%20%C2%B7%20English%20%C2%B7%20%E6%97%A5%E6%9C%AC%E8%AA%9E%20%C2%B7%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-0ea5e9.svg)](#4개-언어와-다크-모드)
 
@@ -179,6 +179,7 @@ Let's Encrypt 인증서를 자동으로 받고 만료 전에 갱신합니다. �
 <!-- releases:start -->
 | 버전 | 날짜 | 주요 내용 | 릴리스 노트 |
 | --- | --- | --- | --- |
+| v1.9.2 | 2026-10-31 | 버그 수정: `nm upgrade --nginx`의 사전 검사가 `compose.override.yml`의 `extra_hosts`로만 풀리는 업스트림 이름을 못 찾아 멈추던 문제 | [v1.9.2](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.9.2.md) |
 | v1.9.1 | 2026-10-31 | 버그 수정과 화면 다듬기: 적용 뒤 대기 목록·메뉴 숫자 바로 갱신, 삭제 대기 사이트의 저장·끄기 버튼 감춤, API 토큰 적용의 작성자 표시, 미리보기에 고칠 곳 표시, 사이트 화면 설정 원문 너비 | [v1.9.1](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.9.1.md) |
 | v1.9.0 | 2026-10-30 | 배포 자동화 API(API 토큰으로 점검 모드 켜고 끄기·적용), 사이트 메모, 관리자 추가 nginx 지시어 | [v1.9.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.9.0.md) |
 | v1.8.0 | 2026-10-30 | 운영 알림(적용 실패, nginx 재시작, 직접 바뀐 설정 파일, 백업 실패, 계정 잠김)과 채널마다 받을 알림, 사이트 여러 개 한꺼번에 켜기·끄기·담당자 지정, 감사 로그 CSV 내려받기 | [v1.8.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.8.0.md) |
@@ -192,5 +193,5 @@ Let's Encrypt 인증서를 자동으로 받고 만료 전에 갱신합니다. �
 | v1.2.1 | 2026-10-30 | 관리 도메인 점검(`nm check-domain`), 인증서를 받으면 바로 HTTPS, 적용 실패 이유를 화면에 표시, Certbot 인증서를 그대로 쓰기(`/etc/letsencrypt` 붙이기, `nm reload`) | [v1.2.1](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.2.1.md) |
 | v1.2.0 | 2026-10-30 | 서버에 한 줄로 설치(`install.sh`, `nm` 명령, 관리 도메인 HTTPS, `nm import-root`), 사용자별 사이트 관리(관리자·멤버 역할, 사이트 담당자), 새 로그인·최초 설정 화면, 관리 화면 안에서 보는 사용 설명서 13장, 브라우저 탭 아이콘 | [v1.2.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.2.0.md) |
 | v1.1.0 | 2026-10-29 | 쓰던 nginx 설정 파일을 사이트로 가져오기: 경로 패턴(`/home/*/nginx/*.conf`)으로 찾아 한꺼번에 등록, 폼/원문 자동 판단, 원본 바뀜 알림과 다시 가져오기. 화면 다듬기: 고른 유형만 보이는 사이트 폼, 놓치지 않는 미리보기, 대상이 보이는 사이트 목록, 접히는 적용 diff, 휴대폰 메뉴 버튼 | [v1.1.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.1.0.md) |
-| v1.0.0 | 2026-10-29 | 첫 정식 릴리스: 폼으로 사이트·TCP/UDP 스트림 만들기, 검증 후 적용과 자동 복구, 이력·비교·롤백, Let's Encrypt 자동 발급·갱신, 대시보드와 로그, 4개 언어·다크 모드, 사용자·감사 로그, 컨테이너 두 개와 업그레이드 안전장치 | [v1.0.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.0.0.md) |
+| v1.0.0 | 2026-10-29 | 첫 정식 릴리스: 폼으로 사이트·TCP/UDP 스트림 만들기, 검증 후 적용과 자동 복구, 이력·비교·되돌리기, Let's Encrypt 자동 발급·갱신, 대시보드와 로그, 4개 언어·다크 모드, 사용자·감사 로그, 컨테이너 두 개와 업그레이드 안전장치 | [v1.0.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.0.0.md) |
 <!-- releases:end -->
