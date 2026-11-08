@@ -164,7 +164,7 @@ cd /opt/nginx-manager
 | `nginx` | `ghcr.io/nginx-manager/nginx` | nginx（开源版，编译了全部模块）和代理程序。代理程序只按管理界面的请求执行 `nginx -t` 和 reload |
 | `manager` | `ghcr.io/nginx-manager/app` | 管理界面（Spring Boot）。直接把配置文件写入共享卷，校验和 reload 交给代理程序 |
 
-升级或重启管理界面时，nginx 会继续处理流量。新的 nginx 镜像在启动 nginx 之前会先校验卷里的配置，不兼容时管理界面会显示出问题的文件和行。nginx 发布新版本后，nginx 镜像会自动重新构建、测试并发布，旧标签保持不变。
+升级或重启管理界面时，nginx 会继续处理流量。新的 nginx 镜像在启动 nginx 之前会先校验卷里的配置，不兼容时管理界面会显示出问题的文件和行。nginx 发布新版本后，nginx 镜像会自动重新构建、测试并发布，旧标签保持不变。服务器重启时，即使上游名称（其他容器、`extra_hosts`）暂时无法解析，nginx 也不会马上放弃，而是在最多 180 秒（`NGINX_STARTUP_RESOLVE_WAIT`）内每 5 秒重新检查一次再启动，不会因为一个站点导致所有站点都停着。如果服务器上另外安装的 nginx（apt 的 `nginx.service`）在开机时先占用了 80/443 端口，`nm status`、`nm upgrade` 和安装程序会提示（v1.10.0）。
 
 ## 仓库
 

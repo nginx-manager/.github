@@ -164,7 +164,7 @@ Use the UI in Korean, English, Japanese or Simplified Chinese, and switch to a d
 | `nginx` | `ghcr.io/nginx-manager/nginx` | nginx (open source, built with all modules) plus an agent. The agent only runs `nginx -t` and reload when the admin UI asks |
 | `manager` | `ghcr.io/nginx-manager/app` | Admin UI (Spring Boot). Writes config files to the shared volume and leaves validation and reload to the agent |
 
-nginx keeps serving traffic while the admin UI is upgraded or restarted. A new nginx image validates the config on the volume before nginx starts, and if it doesn't fit, the admin UI shows the file and line at fault. When nginx ships a new release, the nginx image is rebuilt, tested and published automatically, and older tags stay available.
+nginx keeps serving traffic while the admin UI is upgraded or restarted. A new nginx image validates the config on the volume before nginx starts, and if it doesn't fit, the admin UI shows the file and line at fault. When nginx ships a new release, the nginx image is rebuilt, tested and published automatically, and older tags stay available. After a server reboot, if upstream names (other containers, `extra_hosts`) don't resolve yet, nginx doesn't give up right away: it rechecks every 5 seconds for up to 180 seconds (`NGINX_STARTUP_RESOLVE_WAIT`) before starting, so one site can't keep every site down. If a separately installed nginx (apt's `nginx.service`) grabs ports 80/443 first at boot, `nm status`, `nm upgrade` and the installer tell you (v1.10.0).
 
 ## Repositories
 
