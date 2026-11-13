@@ -8,7 +8,7 @@
 
 nginx와 관리 화면을 컨테이너 두 개로 띄우는 웹 기반 nginx 관리도구
 
-[![Release](https://img.shields.io/badge/release-v1.10.0-10b981.svg)](https://github.com/nginx-manager/app/releases/tag/v1.10.0)
+[![Release](https://img.shields.io/badge/release-v1.11.0-10b981.svg)](https://github.com/nginx-manager/app/releases/tag/v1.11.0)
 [![nginx](https://img.shields.io/badge/nginx-1.31.8-009639.svg)](https://nginx.org/en/CHANGES)
 [![Languages](https://img.shields.io/badge/UI-%ED%95%9C%EA%B5%AD%EC%96%B4%20%C2%B7%20English%20%C2%B7%20%E6%97%A5%E6%9C%AC%E8%AA%9E%20%C2%B7%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-0ea5e9.svg)](#4개-언어와-다크-모드)
 
@@ -179,6 +179,7 @@ Let's Encrypt 인증서를 자동으로 받고 만료 전에 갱신합니다. �
 <!-- releases:start -->
 | 버전 | 날짜 | 주요 내용 | 릴리스 노트 |
 | --- | --- | --- | --- |
+| v1.11.0 | 2026-11-13 | 사이트 담당 멤버도 추가 지시어(server 블록에 덧붙일 nginx 지시어)를 고치고 지움, 자주 쓰는 지시어 목록과 넣기, 파일을 쓰거나 설정·코드를 불러오는 지시어만 관리자에게 요청 → 관리자가 반영·거절 | [v1.11.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.11.0.md) |
 | v1.10.0 | 2026-11-08 | 재부팅 뒤 업스트림 이름을 못 풀어 모든 사이트가 내려가 있던 문제(시작할 때 최대 180초 다시 검사), 부팅 때 80/443을 먼저 잡는 따로 깐 nginx를 `nm status`·`nm upgrade`가 알려 줌 | [v1.10.0](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.10.0.md) |
 | v1.9.3 | 2026-11-03 | 버그 수정: 프록시 대상을 `127.0.0.1`로 적은 사이트가 nginx 컨테이너 자신을 가리켜 연결되지 않던 문제(`host.docker.internal` 기본 제공, 루프백 주소 경고, 가져오기 시 자동 변환) | [v1.9.3](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.9.3.md) |
 | v1.9.2 | 2026-10-31 | 버그 수정: `nm upgrade --nginx`의 사전 검사가 `compose.override.yml`의 `extra_hosts`로만 풀리는 업스트림 이름을 못 찾아 멈추던 문제 | [v1.9.2](https://github.com/nginx-manager/app/blob/main/docs/releases/v1.9.2.md) |
